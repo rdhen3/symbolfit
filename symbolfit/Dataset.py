@@ -45,19 +45,23 @@ class Dataset:
             # x1_edges     = x1_edges[(x1_edges >= cuts[1][0])*(x1_edges <= cuts[1][1])]
             x0cuts = [(x0_edges >= cuts[0][c][0])*(x0_edges <= cuts[0][c][1]) for c in range(len(cuts[0]))]
             passx0 = list(itertools.accumulate(x0cuts, func = lambda a, b : a | b))[-1]
-            print(passx0)
             x0_edges     = x0_edges[passx0]
             x1cuts = [(x1_edges >= cuts[1][c][0])*(x1_edges <= cuts[1][c][1]) for c in range(len(cuts[1]))]
             passx1 = list(itertools.accumulate(x1cuts, func = lambda a, b : a | b))[-1]
             x1_edges     = x1_edges[passx1]
 
-        x_centres = (x0_edges[:-1] + x0_edges[1:])/2
-        y_centres = (x1_edges[:-1] + x1_edges[1:])/2
+        x0_centres = (x0_edges[:-1] + x0_edges[1:])/2
+        x1_centres = (x1_edges[:-1] + x1_edges[1:])/2
 
         if blind is not None:
-            for b in blind:
-                h[np.argmax(x0_edges[:-1] >= blind[b][0][0]):np.argmin(x0_edges[1:] <= blind[b][0][1]), 
-                    np.argmax(x1_edges[:-1] >= blind[b][1][0]):np.argmin(x1_edges[1:] <= blind[b][1][1])] = np.inf
+            for b in range(len(blind)):
+                # row_mask = (x0_edges[:-1] > blind[b][0][0])&(x0_edges[1:] < blind[b][0][1])
+                # col_mask = (x1_edges[:-1] > blind[b][1][0])&(x1_edges[1:] < blind[b][1][1])
+                row_mask = (x0_centres > blind[b][0][0])&(x0_centres < blind[b][0][1])
+                col_mask = (x1_centres > blind[b][1][0])&(x1_centres < blind[b][1][1])
+                row_inds = np.where(row_mask)[0]
+                col_inds = np.where(col_mask)[0]
+                h[np.ix_(row_inds, col_inds)] = np.nan
                 # x0_edges     = x0_edges[(x0_edges < blind[0][0])|(x0_edges > blind[0][1])]
                 # x1_edges     = x1_edges[(x1_edges < blind[1][0])|(x1_edges > blind[1][1])]
 
@@ -71,11 +75,14 @@ class Dataset:
 
         # Bin locations
         if blind is not None:
-            x = [list(tup) for tup in itertools.product(list(x_centres), list(y_centres)) if any([tup[0]>blind[b][0][0] and tup[0]<blind[b][0][1] and tup[1]>blind[b][1][0] and tup[1]<blind[b][1][1] for b in range(len(blind))])]
+            x = [list(tup) for tup in itertools.product(list(x0_centres), list(x1_centres)) if not any([tup[0]>blind[b][0][0] and tup[0]<blind[b][0][1] and tup[1]>blind[b][1][0] and tup[1]<blind[b][1][1] for b in range(len(blind))])]
         else:
-            x = [list(tup) for tup in itertools.product(list(x_centres), list(y_centres))]
+            x = [list(tup) for tup in itertools.product(list(x0_centres), list(x1_centres))]
 
         self.x = x
+
+        # print(len(x), x)
+        # print(h.shape, h)
         
 
         # Bin edges

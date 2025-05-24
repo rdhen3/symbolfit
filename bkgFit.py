@@ -2,7 +2,8 @@ from symbolfit.symbolfit import *
 from symbolfit.Dataset import Dataset
 import pandas as pd
 
-indir       = "/home/shared/B02KstMuMu/Run3/b02kstmumu-run3/output"
+# indir       = "/home/shared/B02KstMuMu/Run3/b02kstmumu-run3/output"
+indir       = "/home/user1/Documents/PHS3350_Projects/ZeyuanJin/"
 filename    = "mB_vs_q2_constrained.root"
 
 # FIXME: crashes if set to True. Cannot currently load previous results and need to rerun
@@ -10,8 +11,7 @@ filename    = "mB_vs_q2_constrained.root"
 load_results = False
 
 dataset = Dataset()
-dataset.create_dataset_from_TH2D(indir, filename, cuts=[[(3.24, 11.56),], [(5440, 5800),]])
-# dataset.create_dataset_from_TH2D(indir, filename, blind=[[(0, 20), (5200, 5100)], [(7, 10), (5100, 5200)]])
+dataset.create_dataset_from_TH2D(indir, filename, cuts=[[(3.24, 11.56),], [(5100, 5800),]], blind=[[(0, 20), (5200, 5440)], [(7, 10), (5100, 5200)]])
 
 pysr_config = importlib.import_module('examples.pysr_configs.pysr_config_gauss').pysr_config
 
@@ -57,7 +57,7 @@ else:
 model.plot_to_pdf(
     output_dir = 'output_dir_train/',
     # bin_widths_1d = dataset.bin_widths_1d,
-    plot_logy = False,
+    plot_logy = True,
     # plot_logx = False,
     sampling_95quantile = False,
     bin_edges_2d = dataset.bin_edges_2d,
@@ -72,28 +72,28 @@ model.plot_to_pdf(
 
 
 
-# Plot with full dataset
-dataset_full = Dataset()
-# dataset_full.create_dataset_from_TH2D(indir, filename, cuts=[(3.24, 11.56), (5100, 5800)])
-dataset_full.create_dataset_from_TH2D(indir, filename, blind=[[(0, 20), (5200, 5100)], [(7, 10), (5100, 5200)]])
-
-model.x         = dataset_full.x
-model.y         = dataset_full.y
-model.y_up      = dataset_full.y_up
-model.y_down    = dataset_full.y_down
-
-model.plot_to_pdf(
-    output_dir = 'output_dir_test/',
-    # bin_widths_1d = dataset.bin_widths_1d,
-    plot_logy = True,
-    # plot_logx = False,
-    sampling_95quantile = False,
-    bin_edges_2d = dataset_full.bin_edges_2d,
-    plot_logx0 = False,
-    plot_logx1 = False,
-    #cbar_min = None,
-    #cbar_max = None,
-    #cmap = None,
-    #contour = None,
-    # ^ additional options for 2D plotting
-)
+# # Plot with full dataset
+# dataset_full = Dataset()
+# # dataset_full.create_dataset_from_TH2D(indir, filename, cuts=[(3.24, 11.56), (5100, 5800)])
+# dataset_full.create_dataset_from_TH2D(indir, filename, blind=[[(0, 20), (5200, 5100)], [(7, 10), (5100, 5200)]])
+# 
+# model.x         = dataset_full.x
+# model.y         = dataset_full.y
+# model.y_up      = dataset_full.y_up
+# model.y_down    = dataset_full.y_down
+# 
+# model.plot_to_pdf(
+#     output_dir = 'output_dir_test/',
+#     # bin_widths_1d = dataset.bin_widths_1d,
+#     plot_logy = True,
+#     # plot_logx = False,
+#     sampling_95quantile = False,
+#     bin_edges_2d = dataset_full.bin_edges_2d,
+#     plot_logx0 = False,
+#     plot_logx1 = False,
+#     #cbar_min = None,
+#     #cbar_max = None,
+#     #cmap = None,
+#     #contour = None,
+#     # ^ additional options for 2D plotting
+# )
